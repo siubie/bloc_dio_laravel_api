@@ -34,6 +34,7 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         title: 'Flutter Auth Demo',
         theme: AppTheme.appTheme,
+        debugShowCheckedModeBanner: false,
         routes: {
           '/': (context) => const LoginPage(),
           '/signup': (context) => const SignupPage(),
