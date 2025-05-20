@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:bloc_dio_laravel_api/blocs/home/home.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -16,36 +18,70 @@ class _HomePageState extends State<HomePage> {
       appBar: AppBar(
         title: const Text('Home'),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: () {
-              // TODO: Implement logout logic with BLoC
-              showDialog(
-                context: context,
-                builder: (BuildContext context) {
-                  return AlertDialog(
-                    title: const Text('Logout'),
-                    content: const Text('Are you sure you want to logout?'),
-                    actions: [
-                      TextButton(
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        },
-                        child: const Text('Cancel'),
-                      ),
-                      TextButton(
-                        onPressed: () {
-                          // TODO: Add logout functionality
-                          Navigator.of(context).pop();
-                          Navigator.of(context).pushReplacementNamed('/');
-                        },
-                        child: const Text('Logout'),
-                      ),
-                    ],
-                  );
-                },
-              );
+          BlocConsumer<HomeBloc, HomeState>(
+            listener: (context, state) {
+              if (state is HomeLogoutSuccess) {
+                // Show success message
+                ScaffoldMessenger.of(
+                  context,
+                ).showSnackBar(SnackBar(content: Text(state.message)));
+                // Navigate to login screen
+                Navigator.of(context).pushReplacementNamed('/');
+              } else if (state is HomeLogoutFailure) {
+                ScaffoldMessenger.of(
+                  context,
+                ).showSnackBar(SnackBar(content: Text(state.error)));
+              }
             },
+            builder:
+                (context, state) => IconButton(
+                  icon:
+                      state is HomeLoading
+                          ? const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: Colors.white,
+                            ),
+                          )
+                          : const Icon(Icons.logout),
+                  onPressed:
+                      state is HomeLoading
+                          ? null
+                          : () {
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  title: const Text('Logout'),
+                                  content: const Text(
+                                    'Are you sure you want to logout?',
+                                  ),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () {
+                                        Navigator.of(context).pop();
+                                      },
+                                      child: const Text('Cancel'),
+                                    ),
+                                    TextButton(
+                                      onPressed: () {
+                                        // Close dialog first
+                                        Navigator.of(context).pop();
+                                        // Then trigger logout event
+                                        context.read<HomeBloc>().add(
+                                          LogoutRequested(),
+                                        );
+                                      },
+                                      child: const Text('Logout'),
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
+                          },
+                ),
           ),
         ],
       ),

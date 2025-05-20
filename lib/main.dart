@@ -4,6 +4,7 @@ import 'package:bloc_dio_laravel_api/pages/login_page.dart';
 import 'package:bloc_dio_laravel_api/pages/signup_page.dart';
 import 'package:bloc_dio_laravel_api/pages/home_page.dart';
 import 'package:bloc_dio_laravel_api/blocs/login/login.dart';
+import 'package:bloc_dio_laravel_api/blocs/home/home.dart';
 import 'package:bloc_dio_laravel_api/core/configs/theme/app_theme.dart';
 import 'package:bloc_dio_laravel_api/core/network/dio_client.dart';
 
@@ -25,6 +26,9 @@ class MyApp extends StatelessWidget {
       providers: [
         BlocProvider<LoginBloc>(
           create: (context) => LoginBloc(dioClient: dioClient),
+        ),
+        BlocProvider<HomeBloc>(
+          create: (context) => HomeBloc(dioClient: dioClient),
         ),
       ],
       child: MaterialApp(
